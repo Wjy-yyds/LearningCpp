@@ -1,12 +1,11 @@
 #include "head.h"
-int sendfd(int sockfd, int fdtosend){
+int sendfd(int sockfd, int fdtosend, int exitflag){
     struct msghdr hdr; //准备好一个
     bzero(&hdr,sizeof(hdr));
     //准备正文
-    char buf[] = "hello";
     struct iovec vec[1];//离散的区域只有一个碎片
-    vec[0].iov_base = buf; //碎片首地址
-    vec[0].iov_len = 5;//碎片长度
+    vec[0].iov_base = &exitflag; //碎片首地址
+    vec[0].iov_len = sizeof(int);//碎片长度
     hdr.msg_iov = vec;//将离散区域和hdr扯上关系
     hdr.msg_iovlen = 1;
     //准备控制字段
@@ -20,14 +19,13 @@ int sendfd(int sockfd, int fdtosend){
     sendmsg(sockfd,&hdr,0);
     return 0;
 }
-int recvfd(int sockfd, int *pfdtorecv){
+int recvfd(int sockfd, int *pfdtorecv, int *pexitflag){
     struct msghdr hdr; //准备好一个
     bzero(&hdr,sizeof(hdr));
     //准备正文
-    char buf[6] = {0};
     struct iovec vec[1];//离散的区域只有一个碎片
-    vec[0].iov_base = buf; //碎片首地址
-    vec[0].iov_len = 5;//碎片长度
+    vec[0].iov_base = pexitflag; //碎片首地址
+    vec[0].iov_len = sizeof(int);//碎片长度
     hdr.msg_iov = vec;//将离散区域和hdr扯上关系
     hdr.msg_iovlen = 1;
     //准备控制字段
@@ -38,7 +36,6 @@ int recvfd(int sockfd, int *pfdtorecv){
     hdr.msg_control = cmsg;
     hdr.msg_controllen = CMSG_LEN(sizeof(int));
     recvmsg(sockfd,&hdr,0);
-    printf("buf = %s, fdtorecv = %d\n", buf, *(int *)CMSG_DATA(cmsg));
     *pfdtorecv = *(int *)CMSG_DATA(cmsg);
     return 0;
 }
@@ -65,5 +62,4 @@ int recvfd(int sockfd, int *pfdtorecv){
 //    }
 //    return 0;
 //}
-
 

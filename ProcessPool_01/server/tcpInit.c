@@ -7,8 +7,8 @@ int tcpInit(char *ip,char *port){
 
     struct sockaddr_in sockaddr;
     sockaddr.sin_family=AF_INET;
-    sockaddr.sin_port=htons(atoi(port));
-    sockaddr.sin_addr.s_addr=inet_addr(ip);
+    sockaddr.sin_port=htons(atoi(MYPORT));
+    sockaddr.sin_addr.s_addr=inet_addr(MYIPSTR);
     
     int ret = bind(sockfd,(struct  sockaddr *)&sockaddr,sizeof(sockaddr));
     ERROR_CHECK(ret,-1,"bind");
