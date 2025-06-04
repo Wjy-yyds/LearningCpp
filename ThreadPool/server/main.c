@@ -56,9 +56,14 @@ int main(int argc, char *argv[]){
             //子进程读端就绪
             else if (readyset[i].data.fd == exitPipe[0]){
                 printf("线程池准备退出\n");
-                for(int j=0;j<workerNum;j++){
-                    pthread_cancel(threadPool.tidArr.arr[j]);
-                }
+                //for(int j=0;j<workerNum;j++){
+                  //  pthread_cancel(threadPool.tidArr.arr[j]);
+                //}
+                pthread_mutex_lock(&threadPool.mutex);
+                threadPool.exitFlag = 1;//线程的资源共享导致可以更方便的访问资源
+                pthread_cond_broadcast(&threadPool.cond);
+                pthread_mutex_unlock(&threadPool.mutex);
+
                 for(int j=0; j < workerNum; j++){
                     pthread_join(threadPool.tidArr.arr[j],NULL);
                 }

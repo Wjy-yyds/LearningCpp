@@ -16,6 +16,7 @@ int recvn(int sockfd, void *buf, ssize_t length){
 }
 
 int recvfile(int sockfd) {
+    sleep(10);
     train_t train;
     // 接收文件名
     recvn(sockfd, &train.length, sizeof(train.length));
